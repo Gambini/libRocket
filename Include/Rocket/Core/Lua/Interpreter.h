@@ -112,7 +112,7 @@ private:
     void Startup();
 
     /** Lua state that Interpreter::Initialise() creates.    */
-    static lua_State* _L;
+    static lua_State* L;
 };
 }
 }
