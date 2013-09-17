@@ -27,12 +27,11 @@ OPTIONS:
     -n  Path to where ndk-build resides. Use this if you
         do not have ndk-build in your path
         Default: topmost directory from output of 'which ndk-build'
-    
-    -A  Build for armeabi and armeabi-v7a
 
-    -M  Build for mips
-
-    -X  Build for X86
+    -a  Architecture. As of ndk-r9 possible options are 
+        armeabi|armeabi-v7a|mips|x86
+        You can specify this option multiple times
+        Default: -a armeabi -a armeabi-v7a -a mips -a x86
 EOF
 }
 
@@ -48,10 +47,9 @@ PATH_TO_FREETYPE=
 TOPDIR=`pwd`
 #should return x86 or x86_64
 USER_HOST_ARCH=`uname -m`
-#shared ndk vars
 NDK=`which ndk-build | sed -rn -e "s/^(.+)\/ndk\-build/\1/gp"`
 
-while getopts "hf:t:p:n:AMX" OPTION
+while getopts "hf:t:p:n:a:" OPTION
 do
     case $OPTION in
         h)
@@ -70,14 +68,8 @@ do
         n)
             NDK=$OPTARG
             ;;
-        A)
-            BUILD_ARCHS+=" armeabi armeabiv7a "
-            ;;
-        M)
-            BUILD_ARCHS+=" mips "
-            ;;
-        X)
-            BUILD_ARCHS+=" x86 "
+        a)
+            BUILD_ARCHS+="$OPTARG "
             ;;
         ?)
             usage
@@ -87,7 +79,7 @@ do
 done
 
 if [[ -z $BUILD_ARCHS ]]; then
-    BUILD_ARCHS="armeabi armeabiv7a mips x86"
+    BUILD_ARCHS="armeabi armeabi-v7a mips x86"
 fi
 
 if [[ -z $PATH_TO_FREETYPE ]]; then
@@ -123,7 +115,7 @@ PATH=$OLDPATH
 #armeabi-v7a
 ARMV7_FLAGS="--sysroot $ARM_NDKSYSROOT -march=armv7-a -mfloat-abi=softfp -mfpu=neon -Wl,--fix-cortex-a8"
 PATH=$ARM_NDKHOST:$OLDPATH
-if [[ $BUILD_ARCHS =~ armeabiv7a ]]; then
+if [[ $BUILD_ARCHS =~ armeabi\-v7a ]]; then
 $PATH_TO_FREETYPE/configure \
     --with-sysroot=$ARM_NDKSYSROOT/usr/lib \
     --without-zlib \
